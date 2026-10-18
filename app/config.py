@@ -36,11 +36,29 @@ TTS_VOICE_EDGE = os.getenv("TTS_VOICE_EDGE", "en-IN-NeerjaNeural")
 VAD_AGGRESSIVENESS = 2  # webrtcvad 0-3, higher = more aggressive filtering of non-speech
 VAD_FRAME_MS = 30
 BARGE_IN_MIN_SPEECH_MS = 450  # sustained voiced audio needed before we treat it as a real interruption
-# Ignore voiced frames quieter than this RMS (int16). Laptop-speaker echo into the same
-# machine's mic is usually quieter than close-talk barge-in speech; this is a soft AEC
-# substitute, not a real echo canceller.
+# Ignore voiced frames quieter than this RMS (int16). This is a FLOOR, not the real gate --
+# see BARGE_IN_ECHO_MARGIN below. A static RMS floor alone isn't reliable: how loud echo
+# is depends on speaker volume/mic sensitivity/room, which changes run to run, so a fixed
+# number like 1200 can be cleared easily by moderate speaker bleed. Kept as a cheap first
+# check (and as the fallback when no reference signal is available, e.g. in unit tests).
 BARGE_IN_MIN_RMS = int(os.getenv("BARGE_IN_MIN_RMS", "1200"))
+# The real echo gate: while TTS is playing, we know exactly what SHOULD be causing any
+# mic echo -- the audio we're playing right now. Each mic frame's RMS is compared against
+# the RMS of the TTS reference signal at that same point in playback, scaled by this
+# margin. Echo is always *proportional* to what's playing (louder TTS -> louder echo);
+# real user speech is not tied to the TTS waveform at all, so a frame only counts as real
+# speech if its RMS clears (reference_rms * BARGE_IN_ECHO_MARGIN). This adapts automatically
+# to playback volume instead of needing a hand-tuned constant per machine/room.
+BARGE_IN_ECHO_MARGIN = float(os.getenv("BARGE_IN_ECHO_MARGIN", "2.2"))
+# Ambient-room noise floor, measured fresh before each live playback (see
+# run_voice_demo.py's calibrate_noise_floor()) -- covers HVAC hum, fan noise, etc. that
+# isn't TTS echo but also isn't the user talking. Frames must also clear
+# (noise_floor_rms * this margin).
+BARGE_IN_NOISE_FLOOR_MARGIN = float(os.getenv("BARGE_IN_NOISE_FLOOR_MARGIN", "3.0"))
 BARGE_IN_GRACE_PERIOD_MS = int(os.getenv("BARGE_IN_GRACE_PERIOD_MS", "600"))
 # Live-mode playback gain (0-1). Quieter speakers = less mic bleed / false barge-in.
+# Still worth keeping low -- it reduces absolute echo level, which helps the noise-floor
+# check -- but the echo_margin gate above is what actually makes this reliable regardless
+# of this value.
 LIVE_PLAYBACK_GAIN = float(os.getenv("LIVE_PLAYBACK_GAIN", "0.4"))
 SAMPLE_RATE = 16000

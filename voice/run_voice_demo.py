@@ -165,6 +165,29 @@ def run_offline_mode():
         print(f"  [{v['status']}] {k}")
 
 
+def _rms_int16(samples) -> float:
+    """RMS of a float32 [-1, 1]-ish array, scaled to the same units as audioop.rms() on
+    int16 PCM (what barge_in.frame_rms uses for mic frames), so reference and mic RMS are
+    directly comparable."""
+    import numpy as np
+    if len(samples) == 0:
+        return 0.0
+    scaled = samples.astype("float64") * 32767.0
+    return float(np.sqrt(np.mean(scaled * scaled)))
+
+
+def calibrate_noise_floor(seconds: float = 0.3) -> float:
+    """Record a brief moment of ambient silence (before any playback starts) and return
+    its RMS, so the barge-in gate can tell 'room noise' apart from both TTS echo and real
+    speech -- rather than assuming a fixed noise level that may not match this room/mic."""
+    import sounddevice as sd
+    print(f"Calibrating ambient noise floor ({seconds}s, please stay quiet)...")
+    audio = sd.rec(int(seconds * config.SAMPLE_RATE), samplerate=config.SAMPLE_RATE, channels=1, dtype="int16")
+    sd.wait()
+    import numpy as np
+    return float(np.sqrt(np.mean(audio.astype("float64") ** 2)))
+
+
 def run_live_mode():
     """One interactive live turn: speak a response while listening for barge-in via the
     real mic, measuring true end-of-speech-to-first-audio latency. Run this while
@@ -179,9 +202,12 @@ def run_live_mode():
     tts_result = tts.synthesize(SAMPLE_PROMPT, out_wav)
     print(f"TTS provider: {tts_result['provider']}, latency: {tts_result['latency_ms']}ms")
 
+    noise_floor_rms = calibrate_noise_floor()
+    print(f"Ambient noise floor: {noise_floor_rms:.0f} RMS")
+
     vad = FrameVAD()
     coord = BargeInCoordinator(require_energy_gate=True)
-    coord.start_playback()
+    coord.start_playback(noise_floor_rms=noise_floor_rms)
 
     import soundfile as sf
     data, sr = sf.read(str(out_wav), dtype="float32")
@@ -194,14 +220,17 @@ def run_live_mode():
         f"silent to let it finish."
     )
     print(
-        "TIP: Prefer headphones. Open speakers often echo into the mic and can still "
-        "false-trigger even with the RMS energy gate."
+        "TIP: Prefer headphones for the cleanest result. Open speakers will echo into the "
+        "mic, but the gate below compares each mic frame against what's actually playing "
+        "at that instant (not a fixed guess), so moderate speaker bleed should no longer "
+        "false-trigger on its own."
     )
     sd.play(data, sr)
 
     frame_samples = int(config.SAMPLE_RATE * (config.VAD_FRAME_MS / 1000.0))
     stream = sd.InputStream(samplerate=config.SAMPLE_RATE, channels=1, dtype="int16", blocksize=frame_samples)
     stream.start()
+    playback_start = time.perf_counter()
     barged_in = False
     try:
         start = time.perf_counter()
@@ -209,7 +238,18 @@ def run_live_mode():
             frame, _ = stream.read(frame_samples)
             frame_bytes = frame.tobytes()
             is_voiced = vad.is_speech(frame_bytes) if len(frame_bytes) == vad.frame_bytes else False
-            decision = coord.process_frame(frame_bytes, is_voiced)
+
+            # Find the slice of the TTS playback that's sounding RIGHT NOW (same elapsed
+            # time as this mic frame) and use its RMS as the echo reference -- this is
+            # what makes the gate track actual playback loudness instead of a guessed
+            # constant.
+            elapsed_s = time.perf_counter() - playback_start
+            start_sample = int(elapsed_s * sr)
+            end_sample = start_sample + frame_samples
+            reference_window = data[start_sample:end_sample] if start_sample < len(data) else data[0:0]
+            reference_rms = _rms_int16(reference_window)
+
+            decision = coord.process_frame(frame_bytes, is_voiced, reference_rms=reference_rms)
             if decision == Decision.BARGE_IN:
                 barged_in = True
                 sd.stop()

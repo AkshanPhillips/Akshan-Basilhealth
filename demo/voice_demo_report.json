@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-18 01:31:17",
+  "generated_at": "2026-10-18 15:57:40",
   "scenarios": [
     {
       "scenario": "silence_through_playback",
@@ -30,7 +30,7 @@
     "tts_simulated_primary_failure": {
       "status": "PASS",
       "fell_back_to": "pyttsx3",
-      "latency_ms": 1653.08
+      "latency_ms": 2083.82
     }
   }
 }

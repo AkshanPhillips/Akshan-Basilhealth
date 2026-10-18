@@ -113,17 +113,75 @@ def test_grace_period_prevents_self_trigger_at_playback_start():
     assert Decision.BARGE_IN not in decisions
 
 
+def test_reference_aware_gate_rejects_proportional_echo():
+    """A mic frame whose RMS roughly matches the currently-playing TTS reference (scaled
+    down, as real speaker-bleed echo would be) must NOT count as a barge-in, even though
+    its raw RMS clears the static MIN_RMS floor -- this is the exact live-demo bug
+    (transcribing the bot's own 'Your order...' as if the user spoke) that the reference-
+    aware gate exists to close."""
+    import struct
+
+    from voice.barge_in import frame_rms
+
+    coord = BargeInCoordinator(require_energy_gate=True)
+    coord.start_playback()
+
+    # Echo-like frame: loud enough to pass MIN_RMS on its own, but proportional to (here,
+    # roughly equal to) what's "playing" right now.
+    echo_frame = struct.pack("<" + "h" * 20, *([2000] * 20))
+    assert frame_rms(echo_frame) > 1200  # clears the static floor alone
+
+    grace_frames = GRACE_PERIOD_MS // FRAME_MS + 1
+    for _ in range(grace_frames):
+        coord.process_frame(echo_frame, is_voiced=False, reference_rms=2000)
+
+    decisions = []
+    for _ in range(MIN_SPEECH_MS // FRAME_MS + 5):
+        d = coord.process_frame(echo_frame, is_voiced=True, reference_rms=2000)
+        decisions.append(d)
+    assert Decision.BARGE_IN not in decisions, (
+        "Echo proportional to the reference signal should be rejected by the echo-margin "
+        "gate even though it clears the static RMS floor"
+    )
+
+
+def test_reference_aware_gate_accepts_loud_real_speech_over_quiet_playback():
+    """Real user speech, much louder than whatever TTS reference is playing at that
+    instant, SHOULD still trigger -- the gate must not become so conservative that it
+    blocks genuine interruptions once a reference signal is present."""
+    import struct
+
+    coord = BargeInCoordinator(require_energy_gate=True)
+    coord.start_playback()
+
+    loud_speech_frame = struct.pack("<" + "h" * 20, *([9000] * 20))
+    quiet_reference = 500  # TTS is quiet/trailing off at this instant
+
+    grace_frames = GRACE_PERIOD_MS // FRAME_MS + 1
+    for _ in range(grace_frames):
+        coord.process_frame(loud_speech_frame, is_voiced=False, reference_rms=quiet_reference)
+
+    decisions = []
+    for _ in range(MIN_SPEECH_MS // FRAME_MS + 5):
+        d = coord.process_frame(loud_speech_frame, is_voiced=True, reference_rms=quiet_reference)
+        decisions.append(d)
+    assert Decision.BARGE_IN in decisions, (
+        "Loud speech far above the current reference level should still trigger barge-in"
+    )
+
+
 def test_quiet_frames_fail_energy_gate():
     """Near-silent PCM that VAD marks voiced should be ignored when energy gate is on
     (the speaker-echo / 'Let me...' false barge-in case)."""
-    import audioop
     import struct
+
+    from voice.barge_in import frame_rms
 
     coord = BargeInCoordinator(require_energy_gate=True)
     coord.start_playback()
     # Build quiet int16 frames (RMS well under BARGE_IN_MIN_RMS)
     quiet = struct.pack("<" + "h" * 20, *([50] * 20))  # tiny amplitude
-    assert audioop.rms(quiet, 2) < 200
+    assert frame_rms(quiet) < 200
 
     grace_frames = GRACE_PERIOD_MS // FRAME_MS + 1
     for _ in range(grace_frames):
