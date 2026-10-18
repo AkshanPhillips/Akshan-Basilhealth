@@ -1,0 +1,152 @@
+[
+  {
+    "doc_id": "battery_safety",
+    "chunk_id": "battery_safety::0",
+    "text": "# Battery Safety \u2014 NovaVolt Electronics All NovaVolt lithium-ion products (earbuds, power banks, speakers) are tested to IEC 62133 safety standards. Even so, customers should stop using and immediately unplug/power off any device that shows swelling, unusual heat, a burning smell, or leakage, and contact support rather than continuing to charge or use it. Do not puncture, crush, disassemble, incinerate, or expose NovaVolt batteries to temperatures above 60\u00b0C (e.g., a car dashboard in direct sun). Do not leave devices charging unattended overnight on soft surfaces like a bed or sofa, which can trap heat. A swollen or damaged battery is a safety issue, not a standard warranty replacement \u2014 support should flag these cases for expedited handling rather than routing",
+    "source_path": "/Users/akshanphillipsoffice/Documents/Basilhealth/kb/battery_safety.md"
+  },
+  {
+    "doc_id": "battery_safety",
+    "chunk_id": "battery_safety::1",
+    "text": "a safety issue, not a standard warranty replacement \u2014 support should flag these cases for expedited handling rather than routing them through the normal 7-10 day repair queue.",
+    "source_path": "/Users/akshanphillipsoffice/Documents/Basilhealth/kb/battery_safety.md"
+  },
+  {
+    "doc_id": "international_shipping",
+    "chunk_id": "international_shipping::0",
+    "text": "# International Shipping \u2014 NovaVolt Electronics\n\nNovaVolt currently ships internationally to Nepal, Sri Lanka, UAE, and Singapore only. International\norders take 10-18 business days and are shipped DDU (Delivery Duty Unpaid) \u2014 the recipient is\nresponsible for any customs duties or import taxes charged on arrival, which NovaVolt cannot predict\nor pre-pay on the customer's behalf.\n\nPower banks (like the PB20000) cannot be shipped internationally by air due to lithium battery air\nfreight restrictions; international orders containing a power bank will have that item automatically\nremoved with a refund for that line item, and the rest of the order shipped normally.\n\nNovaVolt does not currently ship outside the four countries listed above.",
+    "source_path": "/Users/akshanphillipsoffice/Documents/Basilhealth/kb/international_shipping.md"
+  },
+  {
+    "doc_id": "order_tracking",
+    "chunk_id": "order_tracking::0",
+    "text": "# Order Tracking \u2014 NovaVolt Electronics You can track an order from the \"My Orders\" page using your order ID (format: NV-XXXXXX) or by clicking the tracking link sent by SMS/email once the order ships. Order statuses, in order: Placed \u2192 Confirmed \u2192 Packed \u2192 Shipped \u2192 Out for Delivery \u2192 Delivered. An order can also show Cancelled or Return Requested. If tracking shows no movement for more than 2 days, this usually means the shipment is awaiting courier pickup or is held at a transit hub \u2014 it does not necessarily mean the order is lost. Support can escalate to the courier partner after 2 full business days of no scan updates, but cannot force an earlier delivery. For",
+    "source_path": "/Users/akshanphillipsoffice/Documents/Basilhealth/kb/order_tracking.md"
+  },
+  {
+    "doc_id": "order_tracking",
+    "chunk_id": "order_tracking::1",
+    "text": "to the courier partner after 2 full business days of no scan updates, but cannot force an earlier delivery. For exact order status and courier-confirmed details, the support assistant should use the order lookup tool rather than guessing from the order date alone.",
+    "source_path": "/Users/akshanphillipsoffice/Documents/Basilhealth/kb/order_tracking.md"
+  },
+  {
+    "doc_id": "payment_methods",
+    "chunk_id": "payment_methods::0",
+    "text": "# Payment Methods \u2014 NovaVolt Electronics\n\nNovaVolt accepts UPI, all major credit/debit cards (Visa, Mastercard, RuPay, Amex), net banking, and\nCash on Delivery (COD) for orders under \u20b915,000. COD carries a \u20b929 handling fee.\n\nNovaVolt also supports 3-month and 6-month no-cost EMI on credit cards for orders above \u20b95,000, subject\nto the issuing bank's eligibility rules \u2014 NovaVolt does not control bank-side EMI approval and cannot\nguarantee a specific bank will approve EMI for a given customer.\n\nIf a payment is deducted but the order shows \"Payment Failed,\" the amount is auto-reversed by the bank\nwithin 5-7 business days. NovaVolt does not hold failed-payment funds and cannot manually speed up a\nbank-side reversal.",
+    "source_path": "/Users/akshanphillipsoffice/Documents/Basilhealth/kb/payment_methods.md"
+  },
+  {
+    "doc_id": "product_bluetooth_speaker_bs5",
+    "chunk_id": "product_bluetooth_speaker_bs5::0",
+    "text": "# Product: NovaVolt BS5 Portable Bluetooth Speaker\n\nPrice: \u20b93,299. 20W output, IPX6 water resistance (safe for rain/splashes, not for submersion), 12-hour\nbattery life at 60% volume, Bluetooth 5.1 with a 10m typical range (line of sight).\n\nSupports pairing two BS5 speakers together in stereo mode via the NovaVolt Connect app. Has a USB-C\ncharging port and a 3.5mm aux-in for wired sources.\n\nFloats on water but is not designed to be submerged or used underwater \u2014 \"IPX6\" rates resistance to\npowerful water jets, not immersion. Submersion is not covered under warranty.",
+    "source_path": "/Users/akshanphillipsoffice/Documents/Basilhealth/kb/product_bluetooth_speaker_bs5.md"
+  },
+  {
+    "doc_id": "product_laptop_charger_pd65",
+    "chunk_id": "product_laptop_charger_pd65::0",
+    "text": "# Product: NovaVolt PD65 USB-C Laptop Charger\n\nPrice: \u20b91,799. 65W USB-C Power Delivery charger, compatible with most USB-C laptops (MacBook Air/Pro\nup to 14\", Dell XPS, HP Spectre, Lenovo ThinkPad with USB-C PD charging) as well as phones/tablets that\nsupport USB-C PD fast charging.\n\nIncludes: PD65 adapter, 1.5m braided USB-C to USB-C cable. Input: 100-240V (works worldwide with a\nplug adapter, voltage auto-switching). Over-current, over-voltage, and over-heat protection built in.\n\nNote: laptops that charge only via a proprietary barrel connector (older Dell/HP/Lenovo models without\nUSB-C PD) are NOT compatible with the PD65 \u2014 check your laptop's charging port before ordering.",
+    "source_path": "/Users/akshanphillipsoffice/Documents/Basilhealth/kb/product_laptop_charger_pd65.md"
+  },
+  {
+    "doc_id": "product_powerbank_pb20000",
+    "chunk_id": "product_powerbank_pb20000::0",
+    "text": "# Product: NovaVolt PB20000 Power Bank\n\nPrice: \u20b92,199. 20,000mAh capacity, 22.5W fast charging output (USB-C and USB-A ports, one of each),\n18W USB-C PD input for recharging the bank itself (~3.5 hours from empty with a PD charger).\n\nCan charge a typical smartphone roughly 3.5-4 times, or a tablet about 1.5 times, before needing a\nrecharge \u2014 actual numbers vary by device battery health and charging losses, so NovaVolt states these\nas typical ranges, not guarantees.\n\nAirline carry-on note: 20,000mAh (\u224874Wh) is within the common 100Wh carry-on limit for most airlines,\nbut passengers should confirm with their specific airline before flying, as rules vary.",
+    "source_path": "/Users/akshanphillipsoffice/Documents/Basilhealth/kb/product_powerbank_pb20000.md"
+  },
+  {
+    "doc_id": "product_smart_plug_sp2",
+    "chunk_id": "product_smart_plug_sp2::0",
+    "text": "# Product: NovaVolt SP2 Smart Wi-Fi Plug\n\nPrice: \u20b9899. 10A smart plug, works over 2.4GHz Wi-Fi (does not support 5GHz networks), controlled via\nthe \"NovaVolt Home\" app. Supports scheduling, away-mode random on/off, and voice control through\nAmazon Alexa and Google Assistant (after linking the NovaVolt Home skill/action).\n\nMax load: 10A / 2200W resistive load. Not rated for inductive loads like large motors or compressors\nabove 1200W \u2014 using it with high-draw appliances beyond rating can trip the plug's internal breaker\nrepeatedly, which is expected safety behavior, not a defect.\n\nRequires a neutral wire at the socket (standard in most Indian households) \u2014 no hub required.",
+    "source_path": "/Users/akshanphillipsoffice/Documents/Basilhealth/kb/product_smart_plug_sp2.md"
+  },
+  {
+    "doc_id": "product_wireless_earbuds_nv100",
+    "chunk_id": "product_wireless_earbuds_nv100::0",
+    "text": "# Product: NovaVolt NV100 Wireless Earbuds\n\nPrice: \u20b92,499. Bluetooth 5.3, 6 hours playback per charge (24 hours with the charging case), IPX4 splash\nresistance, touch controls for play/pause/skip/volume, built-in mic for calls.\n\nBox contents: NV100 earbuds, charging case, USB-C cable, 3 sizes of ear tips (S/M/L), quick start guide.\n\nCompatibility: works with any Bluetooth 5.0+ device (Android, iOS, Windows, most TVs with Bluetooth).\nNo app required for basic use; the optional \"NovaVolt Connect\" app (Android/iOS) unlocks EQ presets\nand firmware updates.\n\nCharging case takes ~1.5 hours for a full charge via USB-C; earbuds fast-charge to 1 hour of playback in\n10 minutes in the case.",
+    "source_path": "/Users/akshanphillipsoffice/Documents/Basilhealth/kb/product_wireless_earbuds_nv100.md"
+  },
+  {
+    "doc_id": "returns_policy",
+    "chunk_id": "returns_policy::0",
+    "text": "# Returns & Refunds Policy \u2014 NovaVolt Electronics Most NovaVolt products are eligible for return within 10 days of delivery, provided the item is unused, in its original packaging, and all accessories/manuals are included. Earbuds, in-ear accessories, and any item marked \"Final Sale\" on the product page are not eligible for return once the seal is broken, for hygiene reasons. To start a return, use the \"Return/Replace\" option in Order History, or ask support with your order ID. We will send a pickup courier within 2 business days of an approved return request. Refunds are issued to the original payment method only, after the returned item passes a quality check at our warehouse (typically 3-5 business days after pickup). Refund",
+    "source_path": "/Users/akshanphillipsoffice/Documents/Basilhealth/kb/returns_policy.md"
+  },
+  {
+    "doc_id": "returns_policy",
+    "chunk_id": "returns_policy::1",
+    "text": "method only, after the returned item passes a quality check at our warehouse (typically 3-5 business days after pickup). Refund processing by the bank/card network can take an additional 5-7 business days and is outside NovaVolt's control. NovaVolt support agents (including automated assistants) are not authorized to confirm a refund amount, waive the 10-day window, or guarantee a specific refund date \u2014 only the finance team can confirm a refund has been issued, via the order's refund status page.",
+    "source_path": "/Users/akshanphillipsoffice/Documents/Basilhealth/kb/returns_policy.md"
+  },
+  {
+    "doc_id": "shipping_policy",
+    "chunk_id": "shipping_policy::0",
+    "text": "# Shipping Policy \u2014 NovaVolt Electronics NovaVolt ships from our Bengaluru and Pune warehouses. Standard domestic shipping takes 3-5 business days and costs \u20b979, or is free on orders over \u20b91,999. Express shipping (1-2 business days) costs \u20b9249 and is available for all pincodes serviceable by our courier partners (Delhivery, Bluedart). Orders placed before 2 PM IST ship the same day. Orders placed after 2 PM, or on Sundays/public holidays, ship the next business day. We do not currently offer same-day delivery. Once an order ships, you'll receive a tracking link by email and SMS. Delivery times are estimates, not guarantees \u2014 monsoon season and remote pincodes can add 1-3 extra days. NovaVolt does not control courier delays and cannot",
+    "source_path": "/Users/akshanphillipsoffice/Documents/Basilhealth/kb/shipping_policy.md"
+  },
+  {
+    "doc_id": "shipping_policy",
+    "chunk_id": "shipping_policy::1",
+    "text": "guarantees \u2014 monsoon season and remote pincodes can add 1-3 extra days. NovaVolt does not control courier delays and cannot promise a specific delivery date beyond the estimate shown at checkout.",
+    "source_path": "/Users/akshanphillipsoffice/Documents/Basilhealth/kb/shipping_policy.md"
+  },
+  {
+    "doc_id": "troubleshoot_charger_not_charging",
+    "chunk_id": "troubleshoot_charger_not_charging::0",
+    "text": "# Troubleshooting: PD65 Charger Not Charging Laptop 1. Confirm your laptop's port actually supports USB-C Power Delivery charging \u2014 some laptops have a USB-C port that is data-only and will never charge from any USB-C charger, including the PD65. 2. Try the included cable first; third-party USB-C cables that don't support 5A/20V PD can silently fail to deliver full power even though the connector fits. 3. Check the adapter's LED (if present on your laptop) or battery icon for a \"slow charging\" vs \"not charging\" indicator \u2014 many laptops will trickle-charge at low power if the system is under heavy load, which looks like a fault but isn't. 4. Test the PD65 on a different USB-C PD device (e.g., a",
+    "source_path": "/Users/akshanphillipsoffice/Documents/Basilhealth/kb/troubleshoot_charger_not_charging.md"
+  },
+  {
+    "doc_id": "troubleshoot_charger_not_charging",
+    "chunk_id": "troubleshoot_charger_not_charging::1",
+    "text": "load, which looks like a fault but isn't. 4. Test the PD65 on a different USB-C PD device (e.g., a phone) to isolate whether the adapter itself is faulty or the laptop's port/battery is the issue. 5. If the adapter doesn't charge any device at all, this indicates an adapter fault and is covered under the 1-year warranty \u2014 do not open or attempt to repair the adapter yourself, as this voids warranty.",
+    "source_path": "/Users/akshanphillipsoffice/Documents/Basilhealth/kb/troubleshoot_charger_not_charging.md"
+  },
+  {
+    "doc_id": "troubleshoot_earbuds_not_pairing",
+    "chunk_id": "troubleshoot_earbuds_not_pairing::0",
+    "text": "# Troubleshooting: NV100 Earbuds Won't Pair 1. Make sure both earbuds are in the case with the lid open, and the LED is blinking white (pairing mode). If the LED isn't blinking, press and hold the case button for 5 seconds to force pairing mode. 2. On your phone, forget/remove any existing \"NovaVolt NV100\" entry from Bluetooth settings before re-pairing \u2014 a stale pairing record is the most common cause of silent pairing failures. 3. Keep the earbuds within 1m of the phone during the initial pair; move away only after the connection is confirmed. 4. If one earbud pairs but not the other, place both back in the case for 10 seconds to resync them, then take them out",
+    "source_path": "/Users/akshanphillipsoffice/Documents/Basilhealth/kb/troubleshoot_earbuds_not_pairing.md"
+  },
+  {
+    "doc_id": "troubleshoot_earbuds_not_pairing",
+    "chunk_id": "troubleshoot_earbuds_not_pairing::1",
+    "text": "but not the other, place both back in the case for 10 seconds to resync them, then take them out together. 5. If pairing still fails after a full case recharge (case LED should go solid red while charging, then off when full), the issue may be hardware-related \u2014 this should be escalated for a warranty check rather than retried indefinitely.",
+    "source_path": "/Users/akshanphillipsoffice/Documents/Basilhealth/kb/troubleshoot_earbuds_not_pairing.md"
+  },
+  {
+    "doc_id": "troubleshoot_smart_plug_offline",
+    "chunk_id": "troubleshoot_smart_plug_offline::0",
+    "text": "# Troubleshooting: SP2 Smart Plug Shows Offline 1. The SP2 only supports 2.4GHz Wi-Fi networks. If your router broadcasts a combined SSID for 2.4GHz and 5GHz, the plug may have associated with the 5GHz band and will never connect \u2014 create a separate 2.4GHz-only SSID temporarily for setup if needed. 2. Power-cycle the plug (unplug for 10 seconds) and check that the LED is fast-blinking blue (setup mode) before attempting to reconnect it in the app. 3. Reset the plug by holding the button for 5 seconds until the LED blinks rapidly, then redo setup from scratch in the NovaVolt Home app. 4. Router-side MAC filtering or guest-network client isolation can block the plug even after it joins Wi-Fi successfully",
+    "source_path": "/Users/akshanphillipsoffice/Documents/Basilhealth/kb/troubleshoot_smart_plug_offline.md"
+  },
+  {
+    "doc_id": "troubleshoot_smart_plug_offline",
+    "chunk_id": "troubleshoot_smart_plug_offline::1",
+    "text": "Home app. 4. Router-side MAC filtering or guest-network client isolation can block the plug even after it joins Wi-Fi successfully \u2014 check router settings if the plug connects but still shows \"offline\" in-app. 5. If the plug repeatedly drops offline after a successful setup (not a setup failure), this is likely a hardware fault and should be escalated for a warranty/replacement check rather than repeated resets.",
+    "source_path": "/Users/akshanphillipsoffice/Documents/Basilhealth/kb/troubleshoot_smart_plug_offline.md"
+  },
+  {
+    "doc_id": "troubleshoot_speaker_no_sound",
+    "chunk_id": "troubleshoot_speaker_no_sound::0",
+    "text": "# Troubleshooting: BS5 Speaker Connects but No Sound 1. Check the volume on both the source device AND the speaker itself (the speaker has its own physical volume buttons, independent of phone volume). 2. If paired via Bluetooth, confirm the phone/laptop's audio output is actually routed to the BS5 and not still playing through the device's internal speaker \u2014 this is the most common cause of \"silent\" pairing. 3. If using the 3.5mm aux-in, note that plugging in an aux cable disables Bluetooth audio automatically; unplug the aux cable to return to Bluetooth mode. 4. In stereo-pair mode (two BS5 speakers linked), if only one speaker plays audio, re-run the stereo pair setup in the NovaVolt Connect app \u2014 a",
+    "source_path": "/Users/akshanphillipsoffice/Documents/Basilhealth/kb/troubleshoot_speaker_no_sound.md"
+  },
+  {
+    "doc_id": "troubleshoot_speaker_no_sound",
+    "chunk_id": "troubleshoot_speaker_no_sound::1",
+    "text": "speakers linked), if only one speaker plays audio, re-run the stereo pair setup in the NovaVolt Connect app \u2014 a dropped stereo link can leave one speaker silently connected but muted. 5. If sound is still absent after a factory reset (hold power + volume-down for 8 seconds), this indicates a hardware fault and should be escalated for warranty evaluation.",
+    "source_path": "/Users/akshanphillipsoffice/Documents/Basilhealth/kb/troubleshoot_speaker_no_sound.md"
+  },
+  {
+    "doc_id": "warranty_policy",
+    "chunk_id": "warranty_policy::0",
+    "text": "# Warranty Policy \u2014 NovaVolt Electronics All NovaVolt-branded products carry a 1-year manufacturer warranty against manufacturing defects, starting from the delivery date. Power banks and chargers carry a 6-month warranty on the battery cell specifically (the casing and ports remain covered for 1 year). Warranty does NOT cover: physical damage (drops, cracks, liquid damage), damage from using a non-NovaVolt charger/cable, unauthorized repair attempts, or normal cosmetic wear. To claim warranty service, contact support with your order ID and a description/photo of the issue. If approved, we offer either a repair (via our service center, 7-10 business days) or a replacement unit, at NovaVolt's discretion based on stock availability. Warranty claims do not automatically mean a refund; refunds under warranty are",
+    "source_path": "/Users/akshanphillipsoffice/Documents/Basilhealth/kb/warranty_policy.md"
+  },
+  {
+    "doc_id": "warranty_policy",
+    "chunk_id": "warranty_policy::1",
+    "text": "unit, at NovaVolt's discretion based on stock availability. Warranty claims do not automatically mean a refund; refunds under warranty are only issued if a replacement/repair is not possible.",
+    "source_path": "/Users/akshanphillipsoffice/Documents/Basilhealth/kb/warranty_policy.md"
+  }
+]

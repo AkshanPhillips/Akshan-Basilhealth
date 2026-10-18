@@ -1,0 +1,18 @@
+# Core
+groq==0.11.0
+httpx<0.28
+setuptools<70
+python-dotenv==1.0.1
+
+# Embeddings + vector search (CPU only, no GPU needed)
+sentence-transformers==3.0.1
+faiss-cpu==1.8.0.post1
+numpy==1.26.4
+
+# Voice
+edge-tts==6.1.12          # primary TTS (free, cloud, natural voice)
+pyttsx3==2.90              # offline fallback TTS (uses OS voices, no network)
+sounddevice==0.4.7         # mic capture for local demo
+soundfile==0.12.1          # wav read/write
+webrtcvad==2.0.10           # lightweight VAD for barge-in detection
+numpy

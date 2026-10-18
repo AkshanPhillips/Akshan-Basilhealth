@@ -1,0 +1,31 @@
+# Secrets — never commit API keys
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+venv/
+.env/
+*.egg
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Local runtime artifacts
+data/classifier_cache.sqlite3
+demo/_*.wav
+demo/_*.json
+!demo/voice_demo_report.json
+
+# Optional large generated index binaries (meta JSON is fine to keep)
+data/faiss_index/*.index
+data/faiss_index/*.faiss
+*.bin

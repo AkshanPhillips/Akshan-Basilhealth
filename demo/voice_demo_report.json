@@ -1,0 +1,36 @@
+{
+  "generated_at": "2026-10-18 01:31:17",
+  "scenarios": [
+    {
+      "scenario": "silence_through_playback",
+      "status": "SKIPPED",
+      "reason": "missing /Users/akshanphillipsoffice/Documents/Basilhealth/demo/recordings/silence.wav"
+    },
+    {
+      "scenario": "noise_burst_ignored",
+      "status": "SKIPPED",
+      "reason": "missing /Users/akshanphillipsoffice/Documents/Basilhealth/demo/recordings/noise_burst.wav"
+    },
+    {
+      "scenario": "real_interruption",
+      "status": "SKIPPED",
+      "reason": "missing /Users/akshanphillipsoffice/Documents/Basilhealth/demo/recordings/real_interruption.wav"
+    },
+    {
+      "scenario": "adversarial_false_start_then_real",
+      "status": "SKIPPED",
+      "reason": "missing /Users/akshanphillipsoffice/Documents/Basilhealth/demo/recordings/adversarial_false_start.wav"
+    }
+  ],
+  "provider_resilience": {
+    "stt_simulated_failure": {
+      "status": "PASS",
+      "note": "degraded gracefully: STT failed after 2 attempts (Simulated STT provider failure (network/key invalidated)); turn degraded gracefully, not hung."
+    },
+    "tts_simulated_primary_failure": {
+      "status": "PASS",
+      "fell_back_to": "pyttsx3",
+      "latency_ms": 1653.08
+    }
+  }
+}
