@@ -90,5 +90,15 @@ interruption (or answers their new question/clarification), and explicitly promp
 is satisfied and asks if they would like to continue with what the assistant was previously saying.
 (4) If the user says "continue" / "go on", the assistant picks up seamlessly and completes the prior statement.
 
+**2026-10-19 00:00 IST** — Migrated orchestration to a full LangGraph `StateGraph` Multi-Agent Architecture:
+(1) Built an explicit `StateGraph(SupportState)` state machine in `app/orchestrator.py` with typed state
+holding message history, intent, guardrail decisions, tool-confirmed facts, and responses.
+(2) Configured specialized agent and guardrail nodes: `input_guardrail`, `router`, `tool_agent` (Groq function-calling),
+`rag_agent` (FAISS vector search), `greeting_node`, `resume_node`, `escalate_node`, and `output_guardrail`.
+(3) Structured conditional routing edges ensuring input guardrails must PASS before routing, and all agent
+paths converge through the output guardrail before reaching `END`.
+(4) Added automatic graceful fallback so the system functions dynamically whether or not `langgraph` package
+is pre-installed, while maintaining 100% compliance with `tests/test_no_bypass.py` structural checks.
+
 ---
-*(more entries will be added as LangGraph migration, red-team cases, and eval work proceed)*
+*(more entries will be added as red-team cases and eval work proceed)*
