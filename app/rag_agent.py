@@ -25,7 +25,7 @@ Retrieved passages:
 """
 
 
-def run(message: str) -> dict:
+def run(message: str, conversation_context: list[dict] | None = None) -> dict:
     retriever = get_retriever()
     results = retriever.search(message, top_k=config.TOP_K_RETRIEVAL)
 
@@ -34,12 +34,14 @@ def run(message: str) -> dict:
     else:
         context = "\n\n".join(f"[{r['doc_id']}] {r['text']}" for r in results)
 
+    messages = [{"role": "system", "content": _SYSTEM_PROMPT.format(context=context)}]
+    if conversation_context:
+        messages.extend(conversation_context)
+    messages.append({"role": "user", "content": message})
+
     resp = chat_completion(
         model=config.GROQ_CHAT_MODEL,
-        messages=[
-            {"role": "system", "content": _SYSTEM_PROMPT.format(context=context)},
-            {"role": "user", "content": message},
-        ],
+        messages=messages,
         temperature=0.2,
     )
     reply = resp.choices[0].message.content

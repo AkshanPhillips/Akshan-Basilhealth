@@ -79,5 +79,16 @@ start of utterance and silence-based End-of-Utterance (EOU), (3) Groq Whisper tr
 barge-in monitoring, retaining any interruption speech frames for the next turn ("no double handling"),
 (7) Instrumented E2E latency ($t_{first\_audio} - t_{eos}$) is measured and reported on each turn.
 
+**2026-10-18 23:30 IST** — Tuned barge-in sensitivity & added contextual interruption flow:
+(1) Tuned sensitivity in `app/config.py`: `BARGE_IN_MIN_RMS` lowered from 1200 to 350 so natural speaking
+volumes on built-in and headset mics trigger reliably. Lowered `BARGE_IN_MIN_SPEECH_MS` from 450ms to 240ms
+and `BARGE_IN_GRACE_PERIOD_MS` from 600ms to 250ms for snappy barge-in response times.
+(2) Built contextual interruption handler: When user interrupts during playback, `play_with_barge_in`
+instantly pauses speech and captures what was being spoken (`interrupted_statement`).
+(3) The orchestrator analyzes the user's interruption in the context of what was cut off, resolves the
+interruption (or answers their new question/clarification), and explicitly prompts if the user's query
+is satisfied and asks if they would like to continue with what the assistant was previously saying.
+(4) If the user says "continue" / "go on", the assistant picks up seamlessly and completes the prior statement.
+
 ---
 *(more entries will be added as LangGraph migration, red-team cases, and eval work proceed)*

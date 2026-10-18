@@ -46,7 +46,11 @@ class SupportResponse:
     guardrail_detail: dict = field(default_factory=dict)
 
 
-def handle_message(message: str, conversation_context: list[dict] | None = None) -> SupportResponse:
+def handle_message(
+    message: str,
+    conversation_context: list[dict] | None = None,
+    interrupted_statement: str | None = None,
+) -> SupportResponse:
     # --- Step 1: input guardrail, unconditional, first thing that touches the raw message ---
     input_check = guardrails.check_input(message)
     if not input_check.allowed:
@@ -59,13 +63,37 @@ def handle_message(message: str, conversation_context: list[dict] | None = None)
     # --- Step 2: route (only reached post-guardrail) ---
     intent, cache_hit = router.classify(message)
 
+    # Build contextual history, including interruption note if the user barged in mid-speech
+    effective_context = list(conversation_context or [])
+    if interrupted_statement:
+        effective_context.append({
+            "role": "system",
+            "content": (
+                f"[Context: The assistant was speaking: \"{interrupted_statement}\", "
+                f"when the user interrupted with: \"{message}\". "
+                "Address the user's interruption directly in this context. "
+                "After answering, check if their query is satisfied and prompt them if they would like to continue with what was being discussed.]"
+            ),
+        })
+
     # --- Step 3: dispatch ---
-    if intent == "order_status":
-        result = tool_agent.run(message, conversation_context)
+    resume_phrases = ("continue", "go on", "what were you saying", "carry on", "go ahead", "resume", "repeat that")
+    if interrupted_statement and any(p in message.lower() for p in resume_phrases):
+        result = {
+            "reply": (
+                f"Certainly! Picking up from where I was interrupted: {interrupted_statement}. "
+                "Does that help, or is there anything else I can check for you?"
+            ),
+            "tool_confirmed_facts": "(none this turn)",
+        }
+    elif intent == "order_status":
+        result = tool_agent.run(message, effective_context)
     elif intent == "product_question":
-        result = rag_agent.run(message)
+        result = rag_agent.run(message, effective_context)
     elif intent == "greeting":
-        if conversation_context:
+        if interrupted_statement:
+            reply = f"No problem at all! As I was mentioning: {interrupted_statement}. Does that resolve what you were looking for?"
+        elif conversation_context:
             reply = "You're very welcome! Is there anything else I can assist you with today?"
         else:
             reply = (

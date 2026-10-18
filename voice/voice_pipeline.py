@@ -136,11 +136,12 @@ def play_with_barge_in(
     stream: sd.InputStream,
     vad: FrameVAD,
     noise_floor_rms: float,
-) -> tuple[bool, list[bytes]]:
+    assistant_text: str = "",
+) -> tuple[bool, list[bytes], str]:
     """
     Plays TTS audio while actively monitoring the microphone for barge-in interruptions.
     Returns:
-      (interrupted: bool, buffered_speech_frames: list[bytes])
+      (interrupted: bool, buffered_speech_frames: list[bytes], interrupted_statement: str)
     """
     coord = BargeInCoordinator(require_energy_gate=True)
     coord.start_playback(noise_floor_rms=noise_floor_rms)
@@ -172,9 +173,9 @@ def play_with_barge_in(
             if decision == Decision.BARGE_IN:
                 interrupted = True
                 sd.stop()
-                print(f"\n⚡ [BARGE-IN DETECTED at {coord.playback_elapsed_ms:.0f}ms] Interrupting playback...")
+                print(f"\n⚡ [BARGE-IN DETECTED at {coord.playback_elapsed_ms:.0f}ms] Pausing playback to listen to you...")
                 buffered_frames = coord.buffered_frames[:]
-                break
+                return True, buffered_frames, assistant_text
     except Exception as e:
         sd.stop()
         print(f"Playback error: {e}")
@@ -183,7 +184,7 @@ def play_with_barge_in(
         sd.wait()
         coord.finish_playback_normally()
 
-    return interrupted, buffered_frames
+    return False, [], ""
 
 
 def run_voice_call():
@@ -207,6 +208,7 @@ def run_voice_call():
     conversation_history: list[dict] = []
     turn_idx = 1
     next_speech_buffer: list[bytes] = []
+    interrupted_statement: str | None = None
 
     try:
         # Step 1: Initial Greeting
@@ -214,9 +216,12 @@ def run_voice_call():
         tts_greeting = tts.synthesize(GREETING_TEXT, TEMP_OUTPUT_WAV)
         print(f"   [TTS: {tts_greeting['provider']} | {tts_greeting['latency_ms']:.1f}ms]")
 
-        interrupted, barge_frames = play_with_barge_in(TEMP_OUTPUT_WAV, stream, vad, noise_floor)
+        interrupted, barge_frames, stmt = play_with_barge_in(
+            TEMP_OUTPUT_WAV, stream, vad, noise_floor, assistant_text=GREETING_TEXT
+        )
         if interrupted:
             next_speech_buffer = barge_frames
+            interrupted_statement = stmt
 
         # Main conversational loop
         while True:
@@ -268,8 +273,13 @@ def run_voice_call():
 
             # Step 4: Process via Part A Orchestrator (Guardrails -> Router/Cache -> Agents)
             t_orch_start = time.perf_counter()
-            response = handle_message(user_text, conversation_context=conversation_history)
+            response = handle_message(
+                user_text,
+                conversation_context=conversation_history,
+                interrupted_statement=interrupted_statement,
+            )
             orch_ms = (time.perf_counter() - t_orch_start) * 1000.0
+            interrupted_statement = None  # Consumed
 
             print(f"🤖 Assistant: \"{response.reply}\"")
             print(f"   [Intent: {response.intent} | Cache Hit: {response.cache_hit} | Guardrail: {response.blocked_at or 'PASS'}]")
@@ -292,9 +302,14 @@ def run_voice_call():
             )
 
             # Step 7: Play response with active barge-in
-            interrupted, barge_frames = play_with_barge_in(TEMP_OUTPUT_WAV, stream, vad, noise_floor)
+            interrupted, barge_frames, stmt = play_with_barge_in(
+                TEMP_OUTPUT_WAV, stream, vad, noise_floor, assistant_text=response.reply
+            )
             if interrupted:
                 next_speech_buffer = barge_frames
+                interrupted_statement = stmt
+            else:
+                interrupted_statement = None
 
             turn_idx += 1
 
