@@ -65,12 +65,16 @@ def handle_message(message: str, conversation_context: list[dict] | None = None)
     elif intent == "product_question":
         result = rag_agent.run(message)
     elif intent == "greeting":
-        result = {
-            "reply": (
+        if conversation_context:
+            reply = "You're very welcome! Is there anything else I can assist you with today?"
+        else:
+            reply = (
                 "Hi! I'm the NovaVolt support assistant. I can help with order status, "
                 "product questions, shipping and returns, or connect you with a human. "
                 "What do you need help with?"
-            ),
+            )
+        result = {
+            "reply": reply,
             "tool_confirmed_facts": "(none this turn)",
         }
     else:  # escalate_to_human

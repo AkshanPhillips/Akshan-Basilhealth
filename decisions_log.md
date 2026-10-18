@@ -69,5 +69,15 @@ local regex pre-check *before* the classifier cache (so a stale cached escalate 
 can't stick), plus a canned welcome reply in the orchestrator. Also tightened the LLM
 prompt so greetings aren't escalate and vague product asks prefer product_question.
 
+**2026-10-18 16:25 IST** — Integrated full conversational voice support line (`voice/voice_pipeline.py` & `main.py --voice`):
+Previously, `voice/run_voice_demo.py` only ran single-turn barge-in tests against canned prompts.
+Built the complete interactive phone-support pipeline as required by Part B of the brief:
+(1) Bot answers with spoken greeting, (2) VAD speech listener with rolling pre-roll buffer detects
+start of utterance and silence-based End-of-Utterance (EOU), (3) Groq Whisper transcribes speech,
+(4) Part A multi-agent orchestrator handles the turn (guardrails, cached routing, tool/RAG agents),
+(5) Edge-TTS (with pyttsx3 fallback) synthesizes speech, (6) Output plays with active real-time
+barge-in monitoring, retaining any interruption speech frames for the next turn ("no double handling"),
+(7) Instrumented E2E latency ($t_{first\_audio} - t_{eos}$) is measured and reported on each turn.
+
 ---
 *(more entries will be added as LangGraph migration, red-team cases, and eval work proceed)*
