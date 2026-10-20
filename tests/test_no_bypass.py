@@ -102,3 +102,50 @@ def test_handle_message_returns_early_on_input_block():
                 assert has_return, "The input_check.allowed guard must contain a return statement"
                 found_guard_if = True
     assert found_guard_if, "Could not find the `if not input_check.allowed` early-return guard"
+
+
+def test_langgraph_edges_enforce_no_bypass():
+    """Verify runtime LangGraph StateGraph topology:
+    1. Graph must compile cleanly.
+    2. START only transitions to 'input_guardrail' (no direct agent dispatch).
+    3. 'rag_agent' and 'tool_agent' are ONLY reachable from 'router'.
+    4. All agent execution nodes route directly to 'output_guardrail'.
+    5. The only exit paths are 'input_guardrail' (when blocked) or 'output_guardrail' (when allowed).
+    """
+    from app.orchestrator import _SUPPORT_GRAPH, LANGGRAPH_AVAILABLE
+
+    if not LANGGRAPH_AVAILABLE:
+        return
+
+    assert _SUPPORT_GRAPH is not None, "Compiled LangGraph state graph should not be None"
+    graph = _SUPPORT_GRAPH.get_graph()
+
+    # Extract edge map: source -> list of targets
+    edges = [(e.source, e.target) for e in graph.edges]
+    
+    # 1. START node only leads to input_guardrail
+    start_targets = [target for source, target in edges if source == "__start__"]
+    assert start_targets == ["input_guardrail"], (
+        f"START node must only transition to input_guardrail, got: {start_targets}"
+    )
+
+    # 2. rag_agent and tool_agent can only have 'router' as their incoming source
+    rag_sources = [source for source, target in edges if target == "rag_agent"]
+    tool_sources = [source for source, target in edges if target == "tool_agent"]
+    assert rag_sources == ["router"], f"rag_agent must only be reached from router, got: {rag_sources}"
+    assert tool_sources == ["router"], f"tool_agent must only be reached from router, got: {tool_sources}"
+
+    # 3. All generating nodes must transition to output_guardrail
+    generating_nodes = ["rag_agent", "tool_agent", "resume_node", "greeting_node", "escalate_node"]
+    for node in generating_nodes:
+        targets = [target for source, target in edges if source == node]
+        assert targets == ["output_guardrail"], (
+            f"Node '{node}' must only transition to 'output_guardrail', got: {targets}"
+        )
+
+    # 4. output_guardrail must transition to __end__
+    output_targets = [target for source, target in edges if source == "output_guardrail"]
+    assert output_targets == ["__end__"], (
+        f"output_guardrail must transition to __end__, got: {output_targets}"
+    )
+

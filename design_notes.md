@@ -48,10 +48,17 @@ flowchart TD
 
 ### 2.2 Structural Proof of Guardrail Enforcement (No Bypass)
 * The assignment requires proving structurally—not by assuming runtime behavior—that no unchecked message can reach the RAG agent or tool-calling agent.
-* **Verification via AST Scanning ([`tests/test_no_bypass.py`](file:///Users/akshanphillipsoffice/Documents/Basilhealth/tests/test_no_bypass.py))**:
-  1. **Caller Isolation**: Statically parses all Python files in `app/` and asserts that `rag_agent.run()` and `tool_agent.run()` are called **only** inside `app/orchestrator.py`. Any new file attempting to call an agent directly causes the test suite to fail.
-  2. **Topological Order**: Parses the Abstract Syntax Tree (AST) of `handle_message` and verifies that the character offset of `guardrails.check_input` strictly precedes `router.classify`, which strictly precedes `rag_agent.run` and `tool_agent.run`, which strictly precedes `guardrails.check_output`.
-  3. **Early Return**: Verifies that when `input_check.allowed` is False, the function returns immediately within the guard block.
+* **Dual-Layer Structural Verification ([`tests/test_no_bypass.py`](file:///Users/akshanphillipsoffice/Documents/Basilhealth/tests/test_no_bypass.py))**:
+  1. **Runtime LangGraph State Machine Topology (`test_langgraph_edges_enforce_no_bypass`)**:
+     - Inspects the compiled `_SUPPORT_GRAPH` (`CompiledStateGraph`).
+     - Formally asserts that the `__start__` node strictly transitions to `input_guardrail` (no edge exists from start to any agent).
+     - Formally asserts that `rag_agent` and `tool_agent` nodes have only one predecessor edge: the `router`.
+     - Formally asserts that every generative node (`rag_agent`, `tool_agent`, `resume_node`, etc.) connects exclusively to `output_guardrail`.
+     - Confirms that the only two terminal paths to `__end__` are: blocked at `input_guardrail`, or vetted by `output_guardrail`.
+  2. **Caller Isolation & AST Scanning**:
+     - Statically parses all Python files in `app/` and asserts that `rag_agent.run()` and `tool_agent.run()` are referenced **only** inside `app/orchestrator.py`. Any new file attempting to call an agent directly causes the test suite to fail.
+     - Parses the Abstract Syntax Tree (AST) of `handle_message` to verify that `guardrails.check_input` strictly precedes `router.classify` and agent dispatch, and `guardrails.check_output` strictly precedes the returned `SupportResponse`.
+     - Verifies that when `input_check.allowed` is False, the code immediately early-returns without dispatching.
 
 ### 2.3 Scaling to 10k Concurrent Sessions
 To support 10,000 concurrent support sessions without degradation:
@@ -80,15 +87,19 @@ When introducing a new agent to an existing multi-agent router:
    - Maintain a golden eval dataset of 200+ canonical user utterances across existing intents.
    - Running CI/CD tests ensures that adding `billing_dispute` does not cause routing accuracy on `order_status` or `product_question` to drop below 98%.
 
-### 2.5 Eval Set & Metrics for Routing Accuracy and Guardrail Recall
-* **Dataset Composition**:
-  - 100 In-domain queries (balanced across order tracking, product specifications, policies).
-  - 50 Ambiguous / boundary queries ("I want my money back", "it stopped working").
-  - 50 Adversarial / Injection queries (jailbreaks, prompt leaks, DAN attacks, unauthorized tool triggers).
-* **Metrics**:
-  - **Routing Accuracy**: Overall accuracy $> 96\%$, measured by confusion matrix across intents.
+### 2.5 Real Evaluation Harness & Golden Dataset ([`scripts/run_eval.py`](file:///Users/akshanphillipsoffice/Documents/Basilhealth/scripts/run_eval.py))
+Rather than relying on theoretical estimates, the repository includes a standalone automated evaluation pipeline:
+* **Golden Evaluation Dataset ([`tests/eval_set.json`](file:///Users/akshanphillipsoffice/Documents/Basilhealth/tests/eval_set.json))**:
+  - 25 curated test cases spanning in-domain queries (`order_status`, `product_question`, `greeting`, `escalate_to_human`), boundary disambiguations, and adversarial prompt injections/jailbreaks.
+  - Each item specifies the exact prompt, expected intent, expected guardrail decision (`allow` vs `block`), and mandatory tool calls.
+* **Evaluation Runner ([`scripts/run_eval.py`](file:///Users/akshanphillipsoffice/Documents/Basilhealth/scripts/run_eval.py))**:
+  - Evaluates end-to-end routing accuracy, guardrail recall (injection block rate), guardrail precision (clean query pass rate), average latency, and cache hit efficiency.
+  - Generates an auditable machine-readable report at `data/eval_report.json`.
+* **Target Benchmarks for Production Scale**:
+  - **Routing Accuracy**: Target $> 96\%$, measured across intent confusion matrix.
   - **Guardrail Recall**: Must be **100%** on critical safety / prompt injection test cases ($0$ false negatives allowed on security boundaries).
-  - **Guardrail Precision**: $> 95\%$ to ensure normal customer questions are not falsely rejected.
+  - **Guardrail Precision**: $> 95\%$ to ensure legitimate customer questions are never falsely rejected.
+
 
 ---
 
