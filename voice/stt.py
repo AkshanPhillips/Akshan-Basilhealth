@@ -45,6 +45,7 @@ def transcribe(wav_bytes: bytes, filename: str = "audio.wav", max_retries: int =
             resp = client.audio.transcriptions.create(
                 file=(filename, io.BytesIO(wav_bytes)),
                 model=config.GROQ_WHISPER_MODEL,
+                temperature=0.0,
             )
             latency_ms = (time.perf_counter() - t0) * 1000.0
             return {"text": resp.text, "latency_ms": round(latency_ms, 2), "attempts": attempt}

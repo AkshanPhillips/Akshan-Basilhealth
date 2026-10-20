@@ -36,13 +36,13 @@ TTS_VOICE_EDGE = os.getenv("TTS_VOICE_EDGE", "en-IN-NeerjaNeural")
 VAD_AGGRESSIVENESS = 2  # webrtcvad 0-3, higher = more aggressive filtering of non-speech
 VAD_FRAME_MS = 30
 BARGE_IN_MIN_SPEECH_MS = int(os.getenv("BARGE_IN_MIN_SPEECH_MS", "240"))  # 240ms sustained speech to trigger barge-in
-# Ignore voiced frames quieter than this RMS (int16). Tuned for standard mic input levels (300-800 RMS).
-BARGE_IN_MIN_RMS = int(os.getenv("BARGE_IN_MIN_RMS", "350"))
+# Ignore voiced frames quieter than this RMS (int16). 2500 blocks open laptop speakers (which produce 1500-2000 RMS at mic).
+BARGE_IN_MIN_RMS = int(os.getenv("BARGE_IN_MIN_RMS", "2500"))
 # The echo gate for live speaker output vs mic input
-BARGE_IN_ECHO_MARGIN = float(os.getenv("BARGE_IN_ECHO_MARGIN", "1.1"))
+BARGE_IN_ECHO_MARGIN = float(os.getenv("BARGE_IN_ECHO_MARGIN", "3.5"))
 # Ambient-room noise floor margin
 BARGE_IN_NOISE_FLOOR_MARGIN = float(os.getenv("BARGE_IN_NOISE_FLOOR_MARGIN", "2.0"))
-BARGE_IN_GRACE_PERIOD_MS = int(os.getenv("BARGE_IN_GRACE_PERIOD_MS", "250"))
+BARGE_IN_GRACE_PERIOD_MS = int(os.getenv("BARGE_IN_GRACE_PERIOD_MS", "300"))
 # Live-mode playback gain (0-1).
-LIVE_PLAYBACK_GAIN = float(os.getenv("LIVE_PLAYBACK_GAIN", "0.4"))
+LIVE_PLAYBACK_GAIN = float(os.getenv("LIVE_PLAYBACK_GAIN", "0.22"))
 SAMPLE_RATE = 16000

@@ -100,5 +100,15 @@ paths converge through the output guardrail before reaching `END`.
 (4) Added automatic graceful fallback so the system functions dynamically whether or not `langgraph` package
 is pre-installed, while maintaining 100% compliance with `tests/test_no_bypass.py` structural checks.
 
+**2026-10-21 00:15 IST** — Solved laptop open-speaker feedback loop & added keyboard interruption:
+(1) Laptop Speaker Feedback Isolation: On laptops without hardware AEC, speakers bleed into the chassis mic at
+~1500-2000 RMS. Raised `BARGE_IN_MIN_RMS` to 2500 and `BARGE_IN_ECHO_MARGIN` to 3.5, while keeping inter-turn
+speech detection threshold gentle (200 RMS), ensuring speaker output never triggers false barge-ins.
+(2) Replaced instantaneous 30ms reference slice with a 500ms sliding envelope window (-350ms to +150ms) to
+account for CoreAudio hardware buffer delay and stop-consonant speech gaps.
+(3) Initial greeting now plays cleanly through before the microphone opens, eliminating startup feedback loops.
+(4) Added non-blocking terminal `[Enter]` key interrupt in `voice_pipeline.py` providing a 100% reliable,
+echo-immune interruption mechanism when testing or recording on open laptop speakers.
+
 ---
 *(more entries will be added as red-team cases and eval work proceed)*

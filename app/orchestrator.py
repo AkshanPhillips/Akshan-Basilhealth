@@ -141,11 +141,24 @@ def _node_resume(state: SupportState) -> dict:
     return {"draft_reply": reply, "tool_confirmed_facts": "(none this turn)"}
 
 
+def _clean_interrupted_statement(stmt: str | None) -> str:
+    if not stmt:
+        return ""
+    cleaned = stmt
+    while "As I was mentioning:" in cleaned:
+        cleaned = cleaned.split("As I was mentioning:")[-1].strip()
+    for suffix in ("Does that resolve what you were looking for?", "Does that help, or is there anything else I can check for you?"):
+        if cleaned.endswith(suffix):
+            cleaned = cleaned[:-len(suffix)].strip()
+    return cleaned
+
+
 def _node_greeting(state: SupportState) -> dict:
     stmt = state.get("interrupted_statement")
     ctx = state.get("conversation_context")
     if stmt:
-        reply = f"No problem at all! As I was mentioning: {stmt}. Does that resolve what you were looking for?"
+        cleaned = _clean_interrupted_statement(stmt)
+        reply = f"No problem at all! As I was mentioning: {cleaned}. Does that resolve what you were looking for?"
     elif ctx:
         reply = "You're very welcome! Is there anything else I can assist you with today?"
     else:
@@ -308,7 +321,8 @@ def handle_message(
         result = rag_agent.run(message, effective_context)
     elif intent == "greeting":
         if interrupted_statement:
-            reply = f"No problem at all! As I was mentioning: {interrupted_statement}. Does that resolve what you were looking for?"
+            cleaned = _clean_interrupted_statement(interrupted_statement)
+            reply = f"No problem at all! As I was mentioning: {cleaned}. Does that resolve what you were looking for?"
         elif conversation_context:
             reply = "You're very welcome! Is there anything else I can assist you with today?"
         else:

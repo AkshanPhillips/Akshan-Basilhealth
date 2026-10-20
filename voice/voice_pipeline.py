@@ -16,6 +16,7 @@ Usage:
 from __future__ import annotations
 
 import collections
+import select
 import sys
 import time
 from pathlib import Path
@@ -55,12 +56,27 @@ def _rms_int16(samples: np.ndarray) -> float:
     return float(np.sqrt(np.mean(scaled * scaled)))
 
 
-def calibrate_ambient_noise(seconds: float = 0.5) -> float:
-    """Samples ambient room noise for calibration."""
-    print("🎧 Calibrating microphone noise floor (0.5s, please remain quiet)...", end="", flush=True)
+def _check_terminal_interrupt() -> bool:
+    """Non-blocking check to allow user to press [Enter] to interrupt during playback."""
+    try:
+        r, _, _ = select.select([sys.stdin], [], [], 0.0)
+        if r:
+            sys.stdin.readline()
+            return True
+    except Exception:
+        pass
+    return False
+
+
+def calibrate_ambient_noise(seconds: float = 0.8) -> float:
+    """Samples ambient room noise for calibration, discarding initial driver warmup frames."""
+    print("🎧 Calibrating microphone noise floor (please remain quiet)...", end="", flush=True)
     audio = sd.rec(int(seconds * config.SAMPLE_RATE), samplerate=config.SAMPLE_RATE, channels=1, dtype="int16")
     sd.wait()
-    rms = float(np.sqrt(np.mean(audio.astype("float64") ** 2)))
+    # Discard initial 200ms to avoid CoreAudio startup zero-padding
+    warm_audio = audio[int(0.2 * config.SAMPLE_RATE):]
+    rms = float(np.sqrt(np.mean(warm_audio.astype("float64") ** 2))) if len(warm_audio) > 0 else 100.0
+    rms = max(rms, 100.0)
     print(f" done (noise floor: {rms:.0f} RMS).")
     return rms
 
@@ -81,11 +97,14 @@ def listen_for_utterance(
     frame_samples = int(config.SAMPLE_RATE * (config.VAD_FRAME_MS / 1000.0))
     pre_speech_buffer: collections.deque[bytes] = collections.deque(maxlen=10)  # ~300ms pre-roll
     speech_frames: list[bytes] = []
+    consecutive_voiced = 0
+    total_voiced_frames = 0
 
     if initial_frames:
         # Barge-in occurred: user speech is already in progress!
         speech_started = True
         speech_frames.extend(initial_frames)
+        total_voiced_frames = len(initial_frames)
         last_voiced_time = time.perf_counter()
         consecutive_silence_ms = 0
         print("\n🎙️  [Interruption captured, continuing to listen...]")
@@ -102,22 +121,27 @@ def listen_for_utterance(
         frame_bytes = frame.tobytes()
         is_voiced = vad.is_speech(frame_bytes) if len(frame_bytes) == vad.frame_bytes else False
 
-        # Additional basic energy floor check
+        # When listening between turns, use quiet speech threshold
         frame_amp = float(np.sqrt(np.mean(frame.astype("float64") ** 2)))
-        energy_ok = frame_amp >= max(config.BARGE_IN_MIN_RMS * 0.7, noise_floor_rms * 1.5)
+        energy_ok = frame_amp >= max(200.0, noise_floor_rms * 1.2)
         voiced_speech = is_voiced and energy_ok
 
         if not speech_started:
             pre_speech_buffer.append(frame_bytes)
             if voiced_speech:
-                speech_started = True
-                speech_frames.extend(pre_speech_buffer)
-                speech_frames.append(frame_bytes)
-                last_voiced_time = time.perf_counter()
-                print("    (Speech detected...)", end="", flush=True)
+                consecutive_voiced += 1
+                if consecutive_voiced >= 3:  # Require 90ms of real voice to start (avoids single-frame pops)
+                    speech_started = True
+                    speech_frames.extend(pre_speech_buffer)
+                    total_voiced_frames += consecutive_voiced
+                    last_voiced_time = time.perf_counter()
+                    print("    (Speech detected...)", end="", flush=True)
+            else:
+                consecutive_voiced = 0
         else:
             speech_frames.append(frame_bytes)
             if voiced_speech:
+                total_voiced_frames += 1
                 consecutive_silence_ms = 0
                 last_voiced_time = time.perf_counter()
             else:
@@ -128,6 +152,10 @@ def listen_for_utterance(
                     break
 
     end_of_speech_ts = last_voiced_time or time.perf_counter()
+    if total_voiced_frames < 4:
+        # Stray noise burst or pop, not real speech
+        return b"", end_of_speech_ts
+
     return b"".join(speech_frames), end_of_speech_ts
 
 
@@ -159,14 +187,21 @@ def play_with_barge_in(
 
     try:
         while time.perf_counter() - playback_start < duration_s:
+            if _check_terminal_interrupt():
+                interrupted = True
+                sd.stop()
+                print("\n⚡ [USER INTERRUPT] Pausing playback to listen to you...")
+                return True, [], assistant_text
+
             frame, _ = stream.read(frame_samples)
             frame_bytes = frame.tobytes()
             is_voiced = vad.is_speech(frame_bytes) if len(frame_bytes) == vad.frame_bytes else False
 
             elapsed_s = time.perf_counter() - playback_start
-            start_sample = int(elapsed_s * sr)
-            end_sample = start_sample + frame_samples
-            reference_window = data[start_sample:end_sample] if start_sample < len(data) else data[0:0]
+            # Use a 500ms window (-350ms to +150ms) to bridge acoustic delay and syllable stops
+            win_start = max(0, int((elapsed_s - 0.35) * sr))
+            win_end = min(len(data), int((elapsed_s + 0.15) * sr))
+            reference_window = data[win_start:win_end]
             reference_rms = _rms_int16(reference_window)
 
             decision = coord.process_frame(frame_bytes, is_voiced, reference_rms=reference_rms)
@@ -194,7 +229,7 @@ def run_voice_call():
     print("\n========================================================")
     print("📞  NovaVolt Interactive Voice Support Line (Connected)")
     print("========================================================")
-    print("TIP: Wear headphones for best results to prevent speaker echo.")
+    print("TIP: You can speak over the bot or press [Enter] to interrupt at any time.")
     print("Type Ctrl+C or say 'goodbye' / 'hang up' at any time to exit.\n")
 
     vad = FrameVAD()
@@ -211,17 +246,14 @@ def run_voice_call():
     interrupted_statement: str | None = None
 
     try:
-        # Step 1: Initial Greeting
+        # Step 1: Initial Greeting plays cleanly to open the call
         print(f"\n🤖 Assistant: \"{GREETING_TEXT}\"")
         tts_greeting = tts.synthesize(GREETING_TEXT, TEMP_OUTPUT_WAV)
         print(f"   [TTS: {tts_greeting['provider']} | {tts_greeting['latency_ms']:.1f}ms]")
 
-        interrupted, barge_frames, stmt = play_with_barge_in(
-            TEMP_OUTPUT_WAV, stream, vad, noise_floor, assistant_text=GREETING_TEXT
-        )
-        if interrupted:
-            next_speech_buffer = barge_frames
-            interrupted_statement = stmt
+        data_greet, sr_greet = sf.read(str(TEMP_OUTPUT_WAV), dtype="float32")
+        sd.play(data_greet * config.LIVE_PLAYBACK_GAIN, sr_greet)
+        sd.wait()
 
         # Main conversational loop
         while True:
@@ -259,8 +291,12 @@ def run_voice_call():
                 play_with_barge_in(TEMP_OUTPUT_WAV, stream, vad, noise_floor)
                 continue
 
-            # Check for exit words
-            normalized = user_text.lower().rstrip(".,!?")
+            # Check for exit words (suppress hallucinated single-word artifacts on fresh calls)
+            normalized = user_text.lower().rstrip(".,!?").strip()
+            if not conversation_history and normalized in ("bye", "goodbye", "you", "thank you"):
+                print("   [Spurious audio detected on greeting, listening again...]")
+                continue
+
             if any(term in normalized for term in ("bye", "goodbye", "hang up", "exit call", "quit")):
                 farewell = "Thank you for calling NovaVolt support. Have a great day!"
                 print(f"\n🤖 Assistant: \"{farewell}\"")
