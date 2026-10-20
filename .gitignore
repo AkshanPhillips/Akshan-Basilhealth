@@ -22,6 +22,7 @@ venv/
 # Local runtime artifacts
 data/classifier_cache.sqlite3
 demo/_*.wav
+demo/_*.aiff
 demo/_*.json
 !demo/voice_demo_report.json
 

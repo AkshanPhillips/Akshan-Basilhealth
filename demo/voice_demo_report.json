@@ -1,25 +1,51 @@
 {
-  "generated_at": "2026-10-18 15:57:40",
+  "generated_at": "2026-10-20 21:29:23",
   "scenarios": [
     {
       "scenario": "silence_through_playback",
-      "status": "SKIPPED",
-      "reason": "missing /Users/akshanphillipsoffice/Documents/Basilhealth/demo/recordings/silence.wav"
+      "description": "Silence through full playback -- should NOT barge in.",
+      "status": "PASS",
+      "expected": "continue_playback",
+      "actual": "continue_playback",
+      "trigger_at_playback_ms": null,
+      "voiced_frames": 0,
+      "total_frames": 100
     },
     {
       "scenario": "noise_burst_ignored",
-      "status": "SKIPPED",
-      "reason": "missing /Users/akshanphillipsoffice/Documents/Basilhealth/demo/recordings/noise_burst.wav"
+      "description": "Short non-speech noise burst -- should be ignored, not interrupt.",
+      "status": "PASS",
+      "expected": "continue_playback",
+      "actual": "continue_playback",
+      "trigger_at_playback_ms": null,
+      "voiced_frames": 3,
+      "total_frames": 100
     },
     {
       "scenario": "real_interruption",
-      "status": "SKIPPED",
-      "reason": "missing /Users/akshanphillipsoffice/Documents/Basilhealth/demo/recordings/real_interruption.wav"
+      "description": "Real user speech ('wait, wrong order') -- SHOULD barge in.",
+      "status": "PASS",
+      "expected": "barge_in",
+      "actual": "barge_in",
+      "trigger_at_playback_ms": 270.0,
+      "voiced_frames": 12,
+      "total_frames": 27,
+      "buffered_utterance_saved_to": "/Users/akshanphillipsoffice/Documents/Basilhealth/demo/recordings/_buffered_real_interruption.wav",
+      "stt_transcript": " Wait.",
+      "stt_latency_ms": 229.71
     },
     {
       "scenario": "adversarial_false_start_then_real",
-      "status": "SKIPPED",
-      "reason": "missing /Users/akshanphillipsoffice/Documents/Basilhealth/demo/recordings/adversarial_false_start.wav"
+      "description": "False start ('um--') then real interruption, close together -- SHOULD barge in (gap-tolerance logic).",
+      "status": "PASS",
+      "expected": "barge_in",
+      "actual": "barge_in",
+      "trigger_at_playback_ms": 450.0,
+      "voiced_frames": 8,
+      "total_frames": 22,
+      "buffered_utterance_saved_to": "/Users/akshanphillipsoffice/Documents/Basilhealth/demo/recordings/_buffered_adversarial_false_start_then_real.wav",
+      "stt_transcript": " Um,",
+      "stt_latency_ms": 183.48
     }
   ],
   "provider_resilience": {
@@ -30,7 +56,7 @@
     "tts_simulated_primary_failure": {
       "status": "PASS",
       "fell_back_to": "pyttsx3",
-      "latency_ms": 2083.82
+      "latency_ms": 2440.01
     }
   }
 }
